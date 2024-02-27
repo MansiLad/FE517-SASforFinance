@@ -1,0 +1,75 @@
+670  /* Name: Mansi Mistry */
+671  /* Student ID: 20011402 */
+672
+673  data statepop;
+674     infile datalines;
+675     input state $ 1-2 Metro_90 4-11  non_metro_90 12-18 region 21;
+676
+677  datalines;
+
+NOTE: Invalid data for non_metro_90 in line 685 12-18.
+RULE:      ----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9-
+685        NJ   7.730     xx   1
+state=NJ Metro_90=7.73 non_metro_90=. region=1 _ERROR_=1 _N_=8
+NOTE: Invalid data for non_metro_90 in line 689 12-18.
+689        DC    .607     xx   2
+state=DC Metro_90=0.607 non_metro_90=. region=2 _ERROR_=1 _N_=12
+NOTE: The data set WORK.STATEPOP has 51 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+
+
+729  ;
+730  run;
+731
+732  title 'Entire Database';
+733  proc print data = statepop;
+734  run;
+
+NOTE: There were 51 observations read from the data set WORK.STATEPOP.
+NOTE: PROCEDURE PRINT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+
+
+735
+736
+737  data statePop_clean statePop_dirty;
+738      set statepop;
+739      lddate = today();
+740      if non_metro_90 = . then output statePop_dirty;
+741      else output statePop_clean;
+742      format lddate date7.;
+743  run;
+
+NOTE: There were 51 observations read from the data set WORK.STATEPOP.
+NOTE: The data set WORK.STATEPOP_CLEAN has 49 observations and 5 variables.
+NOTE: The data set WORK.STATEPOP_DIRTY has 2 observations and 5 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+
+
+744
+745  title 'Clean Data from StatePop Database';
+746  proc print data = statePop_clean;
+747  run;
+
+NOTE: There were 49 observations read from the data set WORK.STATEPOP_CLEAN.
+NOTE: PROCEDURE PRINT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+
+
+748
+749  title 'Missing Data from StatePop Database';
+750  proc print data = statePop_dirty;
+751  run;
+
+NOTE: There were 2 observations read from the data set WORK.STATEPOP_DIRTY.
+NOTE: PROCEDURE PRINT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+
+

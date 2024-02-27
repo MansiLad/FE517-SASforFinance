@@ -1,0 +1,246 @@
+867  /*
+868  FE 517: Final Exam Solution
+869  Name: Mansi Mistry
+870  CWID: 20011402
+871  */
+872
+873  /* Soluiton 1 */
+874  PROC IMPORT OUT= WORK.GDPC1_data
+875              DATAFILE= "O:\FE517\SAS_rawdata\GDPC1.csv"
+876              DBMS=CSV REPLACE;
+877       GETNAMES=YES;
+878       DATAROW=2;
+879  RUN;
+
+880   /**********************************************************************
+881   *   PRODUCT:   SAS
+882   *   VERSION:   9.4
+883   *   CREATOR:   External File Interface
+884   *   DATE:      11DEC23
+885   *   DESC:      Generated SAS Datastep Code
+886   *   TEMPLATE SOURCE:  (None Specified.)
+887   ***********************************************************************/
+888      data WORK.GDPC1_DATA    ;
+889      %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+890      infile 'O:\FE517\SAS_rawdata\GDPC1.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+891         informat DATE mmddyy10. ;
+892         informat GDPC1 best32. ;
+893         format DATE mmddyy10. ;
+894         format GDPC1 best12. ;
+895      input
+896                  DATE
+897                  GDPC1
+898      ;
+899      if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+900      run;
+
+NOTE: The infile 'O:\FE517\SAS_rawdata\GDPC1.csv' is:
+      Filename=O:\FE517\SAS_rawdata\GDPC1.csv,
+      RECFM=V,LRECL=32767,File Size (bytes)=6010,
+      Last Modified=11Dec2023:11:54:38,
+      Create Time=11Dec2023:11:54:38
+
+NOTE: 307 records were read from the infile 'O:\FE517\SAS_rawdata\GDPC1.csv'.
+      The minimum record length was 15.
+      The maximum record length was 19.
+NOTE: The data set WORK.GDPC1_DATA has 307 observations and 2 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.01 seconds
+
+
+307 rows created in WORK.GDPC1_DATA from O:\FE517\SAS_rawdata\GDPC1.csv.
+
+
+
+NOTE: WORK.GDPC1_DATA data set was successfully created.
+NOTE: The data set WORK.GDPC1_DATA has 307 observations and 2 variables.
+NOTE: PROCEDURE IMPORT used (Total process time):
+      real time           0.86 seconds
+      cpu time            0.12 seconds
+
+
+901
+902  proc sort data=GDPC1
+903      nodupkey;
+ERROR: File WORK.GDPC1.DATA does not exist.
+904      by date;
+905  run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+
+906
+
+
+907  data gdpc_filter;
+908    set gdpc1_data;
+909    by date;
+910    if date >= "01JAN2016"d and date <= "31DEC2020"d then output gdpc_filter;
+911  run;
+
+NOTE: There were 307 observations read from the data set WORK.GDPC1_DATA.
+NOTE: The data set WORK.GDPC_FILTER has 20 observations and 2 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.03 seconds
+
+
+912
+913
+914
+915  /* Solution 2 */
+916  libname sasdata "O:\FE517\SAS_data" access = read;
+NOTE: Libref SASDATA was successfully assigned as follows:
+      Engine:        V9
+      Physical Name: O:\FE517\SAS_data
+917  run;
+918
+919  proc copy in=sasdata out=work;
+NOTE: Writing HTML Body file: sashtml3.htm
+920      select inflation wp083;
+921  run;
+
+NOTE: Copying SASDATA.INFLATION to WORK.INFLATION (memtype=DATA).
+NOTE: There were 664 observations read from the data set SASDATA.INFLATION.
+NOTE: The data set WORK.INFLATION has 664 observations and 2 variables.
+NOTE: Copying SASDATA.WP083 to WORK.WP083 (memtype=DATA).
+NOTE: There were 914 observations read from the data set SASDATA.WP083.
+NOTE: The data set WORK.WP083 has 914 observations and 2 variables.
+NOTE: PROCEDURE COPY used (Total process time):
+      real time           0.35 seconds
+      cpu time            0.07 seconds
+
+
+922
+923  data wp083_inflation_comined;
+924      merge inflation(in=indgs rename=(CORESTICKM159SFRBATL=inflation_rate))
+925          wp083(in=insp);
+926      by date;
+927      if indgs and insp then output wp083_inflation_comined;
+928  run ;
+
+NOTE: There were 664 observations read from the data set WORK.INFLATION.
+NOTE: There were 914 observations read from the data set WORK.WP083.
+NOTE: The data set WORK.WP083_INFLATION_COMINED has 663 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+
+
+929
+930  ods rtf file="O:\FE517\SAS_output\regression_report.rtf";
+NOTE: Writing RTF Body file: O:\FE517\SAS_output\regression_report.rtf
+931    title "Plywood (WP083) and inflation Regression Analysis Results";
+932      proc reg data=wp083_inflation_comined;
+933        model WPU083 = inflation_rate;
+934  run;
+
+935  quit;
+
+NOTE: PROCEDURE REG used (Total process time):
+      real time           2.32 seconds
+      cpu time            0.85 seconds
+
+
+936  ods rtf close;
+937
+938
+939  /* Solution 3 */
+940  libname sasdata "O:\FE517\SAS_data" access = read;
+NOTE: Libref SASDATA was successfully assigned as follows:
+      Engine:        V9
+      Physical Name: O:\FE517\SAS_data
+941  run;
+942
+943  proc copy in=sasdata out=work;
+944      select unrate_2021;
+945  run;
+
+NOTE: Copying SASDATA.UNRATE_2021 to WORK.UNRATE_2021 (memtype=DATA).
+NOTE: There were 35 observations read from the data set SASDATA.UNRATE_2021.
+NOTE: The data set WORK.UNRATE_2021 has 35 observations and 2 variables.
+NOTE: PROCEDURE COPY used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.00 seconds
+
+
+946
+947
+948  data unrate_interval;
+949    set unrate_2021;
+950    month = month(date);
+951    year = year(date);
+952  run;
+
+NOTE: There were 35 observations read from the data set WORK.UNRATE_2021.
+NOTE: The data set WORK.UNRATE_INTERVAL has 35 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+
+
+953
+954  data unrate_merged;
+955    merge unrate_interval unrate_2021;
+956  run;
+
+NOTE: There were 35 observations read from the data set WORK.UNRATE_INTERVAL.
+NOTE: There were 35 observations read from the data set WORK.UNRATE_2021.
+NOTE: The data set WORK.UNRATE_MERGED has 35 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+
+
+957
+958  title1 "Unemployment data ";
+959  proc sgplot data=unrate_merged;
+960     series x=date  y=unrate/ ;
+961  run;
+
+NOTE: PROCEDURE SGPLOT used (Total process time):
+      real time           0.09 seconds
+      cpu time            0.04 seconds
+
+NOTE: The column format MMDDYY10 is replaced by an auto-generated format on the axis.
+NOTE: There were 35 observations read from the data set WORK.UNRATE_MERGED.
+
+962
+963  proc esm data=unrate_merged outfor=unrate_fcast LEAD=12;
+964  id  date  INTERVAL=month;
+965  forecast UNRATE/ MODEL=DOUBLE  ;
+966  run;
+
+NOTE: Number of series processed: 1
+NOTE: Number of forecasts requested: 1
+NOTE: Number of forecasts failed: 0
+NOTE: There were 35 observations read from the data set WORK.UNRATE_MERGED.
+NOTE: The data set WORK.UNRATE_FCAST has 47 observations and 8 variables.
+NOTE: The data set WORK.DATA14 has 47 observations and 2 variables.
+NOTE: PROCEDURE ESM used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.03 seconds
+
+
+967
+968  ods rtf file="O:\FE517\SAS_output\unemployment_forcast_report.rtf";
+NOTE: Writing RTF Body file: O:\FE517\SAS_output\unemployment_forcast_report.rtf
+969  title1 "Unemployment data ";
+970  proc sgplot data=unrate_fcast;
+971     series x=date    y=Actual / lineattrs=(  color=black);
+972     series x=date    y=lower / lineattrs=(  color=blue);
+973     series x=date    y=upper / lineattrs=(  color=blue);
+974     series x=date    y=predict/lineattrs=(  color=red);
+975  run;
+
+NOTE: PROCEDURE SGPLOT used (Total process time):
+      real time           0.50 seconds
+      cpu time            0.11 seconds
+
+NOTE: There were 47 observations read from the data set WORK.UNRATE_FCAST.
+
+976  quit;
+977  ods rtf close;
